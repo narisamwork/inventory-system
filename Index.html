@@ -1,0 +1,186 @@
+<!DOCTYPE html>
+<html lang="th">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ระบบจัดการสต็อกสินค้าอย่างง่าย</title>
+    <style>
+        /* --- ส่วนของการออกแบบหน้าตา (CSS) --- */
+        body {
+            font-family: 'Sarabun', 'Prompt', sans-serif;
+            background-color: #f4f7f6;
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 { color: #003366; }
+
+        .container {
+            width: 100%;
+            max-width: 600px;
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0,0,0,0.1);
+            margin-bottom: 20px;
+        }
+
+        input, button {
+            width: 100%;
+            padding: 10px;
+            margin: 5px 0;
+            box-sizing: border-box;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+
+        button {
+            background-color: #007bff;
+            color: white;
+            border: none;
+            cursor: pointer;
+            font-weight: bold;
+            transition: background-color 0.3s;
+        }
+
+        button:hover { background-color: #0056b3; }
+
+        button.delete {
+            background-color: #dc3545;
+            width: auto;
+            padding: 5px 10px;
+            margin-left: 10px;
+        }
+        button.delete:hover { background-color: #a71d2a; }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            margin-top: 15px;
+        }
+
+        th, td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #ddd;
+        }
+
+        th { background-color: #f2f2f2; }
+
+        .action-cell {
+            text-align: right;
+            width: 50px;
+        }
+    </style>
+</head>
+<body>
+
+    <h1>ระบบจัดการสต็อกสินค้า</h1>
+
+    <!-- ส่วนฟอร์มเพิ่มสินค้า -->
+    <div class="container">
+        <h3>เพิ่ม/แก้ไขข้อมูลสินค้า</h3>
+        <input type="hidden" id="editIndex" value=""> <!-- ซ่อนไว้สำหรับแก้ไข -->
+        <input type="text" id="productName" placeholder="ชื่อสินค้า (เช่น: เสื้อโปโล)" required>
+        <input type="number" id="productQty" placeholder="จำนวนในสต็อก" required min="0">
+        <button onclick="saveProduct()">บันทึกสินค้า</button>
+    </div>
+
+    <!-- ส่วนแสดงรายการสินค้า -->
+    <div class="container">
+        <h3>รายการสินค้าคงเหลือ</h3>
+        <table id="inventoryTable">
+            <thead>
+                <tr>
+                    <th>ชื่อสินค้า</th>
+                    <th>จำนวน</th>
+                    <th class="action-cell">ลบ</th>
+                </tr>
+            </thead>
+            <tbody id="productTableBody">
+                <!-- รายการสินค้าจะถูกเพิ่มเข้ามาที่นี่ด้วย JavaScript -->
+            </tbody>
+        </table>
+        <button onclick="clearAllProducts()" style="margin-top: 20px; background-color: #6c757d;">ล้างข้อมูลทั้งหมด</button>
+    </div>
+
+
+    <!-- --- ส่วนของตรรกะการทำงาน (JavaScript) --- -->
+    <script>
+        // ดึงข้อมูลจาก Local Storage เมื่อโหลดหน้าเว็บ
+        let inventory = JSON.parse(localStorage.getItem('myInventory')) || [];
+        renderTable();
+
+        // ฟังก์ชันบันทึกสินค้า (ทั้งเพิ่มใหม่และแก้ไข)
+        function saveProduct() {
+            const nameInput = document.getElementById('productName');
+            const qtyInput = document.getElementById('productQty');
+            const editIndexInput = document.getElementById('editIndex');
+            const name = nameInput.value.trim();
+            const qty = parseInt(qtyInput.value);
+            const editIndex = editIndexInput.value;
+
+            if (name === "" || isNaN(qty) || qty < 0) {
+                alert("กรุณากรอกชื่อสินค้าและจำนวนให้ถูกต้อง (จำนวนต้องไม่ติดลบ)");
+                return;
+            }
+
+            if (editIndex === "") {
+                // เพิ่มสินค้าใหม่
+                inventory.push({ name: name, qty: qty });
+            } else {
+                // แก้ไขสินค้าเดิม
+                inventory[editIndex] = { name: name, qty: qty };
+                editIndexInput.value = ""; // รีเซ็ตค่า editIndex
+            }
+
+            saveAndRender();
+            // ล้างช่องกรอกข้อมูล
+            nameInput.value = '';
+            qtyInput.value = '';
+        }
+
+        // ฟังก์ชันแสดงตารางข้อมูล
+        function renderTable() {
+            const tableBody = document.getElementById('productTableBody');
+            tableBody.innerHTML = ''; // ล้างข้อมูลเดิมก่อน
+
+            inventory.forEach((product, index) => {
+                const row = tableBody.insertRow();
+                row.insertCell().textContent = product.name;
+                row.insertCell().textContent = product.qty;
+                
+                const actionCell = row.insertCell();
+                actionCell.className = 'action-cell';
+                actionCell.innerHTML = `<button class="delete" onclick="deleteProduct(${index})">X</button>`;
+            });
+        }
+
+        // ฟังก์ชันลบสินค้า
+        function deleteProduct(index) {
+            if (confirm(`คุณต้องการลบสินค้า "${inventory[index].name}" ใช่หรือไม่?`)) {
+                inventory.splice(index, 1);
+                saveAndRender();
+            }
+        }
+        
+        // ฟังก์ชันลบข้อมูลทั้งหมด
+        function clearAllProducts() {
+            if (confirm("คุณต้องการล้างข้อมูลสินค้าทั้งหมดออกจากระบบใช่หรือไม่?")) {
+                inventory = [];
+                saveAndRender();
+            }
+        }
+
+        // ฟังก์ชันบันทึกข้อมูลลง Local Storage และอัปเดตหน้าจอ
+        function saveAndRender() {
+            localStorage.setItem('myInventory', JSON.stringify(inventory));
+            renderTable();
+        }
+    </script>
+
+</body>
+</html>
