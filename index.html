@@ -1,398 +1,199 @@
 <!DOCTYPE html>
-<html lang="th" class="scroll-smooth">
+<html lang="th">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Co-op Portfolio | Software Engineering</title>
-    <!-- Tailwind CSS CDN -->
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script>
-        tailwind.config = {
-            theme: {
-                extend: {
-                    colors: {
-                        darkBg: '#030712',
-                        cardBg: '#0f172a',
-                        accentBlue: '#38bdf8',
-                        accentNeon: '#00f2fe',
-                        accentPurple: '#818cf8',
-                    },
-                    animation: {
-                        'pulse-slow': 'pulse 6s cubic-bezier(0.4, 0, 0.6, 1) infinite',
-                        'float': 'float 4s ease-in-out infinite',
-                    },
-                    keyframes: {
-                        float: {
-                            '0%, 100%': { transform: 'translateY(0px)' },
-                            '50%': { transform: 'translateY(-10px)' },
-                        }
-                    }
-                }
-            }
-        }
-    </script>
-    <!-- Font Prompt & FontAwesome -->
-    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <title>ระบบจัดการสต็อกสินค้า</title>
+    <!-- Google Font: Prompt -->
+    <link href="https://fonts.googleapis.com/css2?family=Prompt:wght@300;400;500;600&display=swap" rel="stylesheet">
     <style>
-        body {
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
             font-family: 'Prompt', sans-serif;
-            background-color: #030712;
-            color: #f3f4f6;
-            overflow-x: hidden;
         }
-        .glass-card {
-            background: rgba(15, 23, 42, 0.75);
-            backdrop-filter: blur(16px);
-            -webkit-backdrop-filter: blur(16px);
-            border: 1px solid rgba(56, 189, 248, 0.15);
-            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.37);
+
+        body {
+            background-color: #f4f7f6;
+            color: #333;
+            padding: 40px 20px;
         }
-        .glass-card:hover {
-            border-color: rgba(56, 189, 248, 0.5);
-            box-shadow: 0 0 30px rgba(56, 189, 248, 0.2);
+
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
         }
-        .glow-text {
-            text-shadow: 0 0 20px rgba(56, 189, 248, 0.6);
+
+        h2.title {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 30px;
+            font-weight: 600;
         }
-        .glow-border {
-            box-shadow: 0 0 20px rgba(0, 242, 254, 0.25);
+
+        .card {
+            background: #ffffff;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            margin-bottom: 25px;
         }
-        /* Custom Scrollbar */
-        ::-webkit-scrollbar {
-            width: 8px;
+
+        .card h3 {
+            font-size: 1.1rem;
+            color: #2c3e50;
+            margin-bottom: 20px;
+            font-weight: 500;
+            border-left: 4px solid #3498db;
+            padding-left: 10px;
         }
-        ::-webkit-scrollbar-track {
-            background: #030712;
+
+        .form-group {
+            margin-bottom: 15px;
         }
-        ::-webkit-scrollbar-thumb {
-            background: #1e293b;
-            border-radius: 4px;
+
+        .form-control {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #dcdde1;
+            border-radius: 8px;
+            font-size: 0.95rem;
+            transition: all 0.3s ease;
         }
-        ::-webkit-scrollbar-thumb:hover {
-            background: #38bdf8;
+
+        .form-control:focus {
+            border-color: #3498db;
+            outline: none;
+            box-shadow: 0 0 0 3px rgba(52, 152, 219, 0.15);
+        }
+
+        .btn-primary {
+            width: 100%;
+            padding: 12px;
+            background: linear-gradient(135deg, #3498db, #2980b9);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: opacity 0.3s ease, transform 0.1s ease;
+        }
+
+        .btn-primary:hover {
+            opacity: 0.9;
+        }
+
+        .btn-primary:active {
+            transform: scale(0.98);
+        }
+
+        /* ตารางสินค้าคงเหลือ */
+        .table-container {
+            overflow-x: auto;
+        }
+
+        table {
+            width: 100%;
+            border-collapse: collapse;
+            text-align: left;
+        }
+
+        th {
+            background-color: #f8f9fa;
+            color: #7f8c8d;
+            font-weight: 500;
+            padding: 12px 15px;
+            font-size: 0.9rem;
+            border-bottom: 2px solid #edf2f7;
+        }
+
+        td {
+            padding: 14px 15px;
+            border-bottom: 1px solid #edf2f7;
+            font-size: 0.95rem;
+            color: #2d3748;
+        }
+
+        tr:hover td {
+            background-color: #fafbfc;
+        }
+
+        .text-center {
+            text-align: center;
+        }
+
+        .text-right {
+            text-align: right;
+        }
+
+        .btn-danger {
+            background-color: #e74c3c;
+            color: white;
+            border: none;
+            padding: 6px 12px;
+            border-radius: 6px;
+            cursor: pointer;
+            font-size: 0.85rem;
+            transition: background-color 0.2s;
+        }
+
+        .btn-danger:hover {
+            background-color: #c0392b;
         }
     </style>
 </head>
-<body class="bg-darkBg text-gray-100 selection:bg-accentBlue selection:text-black">
+<body>
 
-    <!-- Background Dynamic Glow Effects -->
-    <div class="fixed top-0 left-1/4 w-96 h-96 bg-blue-600/15 rounded-full blur-[120px] pointer-events-none animate-pulse-slow"></div>
-    <div class="fixed bottom-1/3 right-10 w-96 h-96 bg-indigo-600/15 rounded-full blur-[120px] pointer-events-none animate-pulse-slow"></div>
+    <div class="container">
+        <h2 class="title">📦 ระบบจัดการสต็อกสินค้า</h2>
 
-    <!-- Navbar -->
-    <header class="fixed top-0 left-0 w-full z-50 glass-card border-b border-gray-800/80">
-        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-20 flex items-center justify-between">
-            <a href="#" class="text-xl font-extrabold tracking-wider text-transparent bg-clip-text bg-gradient-to-r from-accentBlue via-accentNeon to-accentPurple glow-text flex items-center gap-2">
-                <i class="fa-solid fa-code text-accentBlue"></i> PORTFOLIO
-            </a>
-            
-            <!-- Desktop Nav -->
-            <nav class="hidden md:flex items-center space-x-8 text-sm font-medium">
-                <a href="#about" class="text-gray-300 hover:text-accentBlue transition duration-300">เกี่ยวกับฉัน</a>
-                <a href="#coop" class="text-gray-300 hover:text-accentBlue transition duration-300">ฝึกสหกิจ</a>
-                <a href="#skills" class="text-gray-300 hover:text-accentBlue transition duration-300">ทักษะ</a>
-                <a href="#projects" class="text-gray-300 hover:text-accentBlue transition duration-300">โปรเจกต์</a>
-                <a href="#contact" class="text-gray-300 hover:text-accentBlue transition duration-300">ติดต่อ</a>
-            </nav>
-
-            <div class="hidden md:block">
-                <a href="#contact" class="px-5 py-2.5 text-xs font-bold rounded-xl bg-gradient-to-r from-accentBlue to-accentNeon text-gray-950 hover:opacity-90 transition duration-300 glow-border">
-                    <i class="fa-solid fa-file-arrow-down mr-1.5"></i> ดาวน์โหลดเรซูเม่
-                </a>
+        <!-- ฟอร์มเพิ่ม/แก้ไขข้อมูล -->
+        <div class="card">
+            <h3>เพิ่ม / แก้ไขข้อมูลสินค้า</h3>
+            <div class="form-group">
+                <input type="text" class="form-control" placeholder="ชื่อสินค้า (เช่น เสื้อโปโล)">
             </div>
-
-            <!-- Mobile Menu Button -->
-            <button id="menu-btn" class="md:hidden text-gray-300 hover:text-white focus:outline-none p-2 text-xl">
-                <i class="fa-solid fa-bars"></i>
-            </button>
+            <div class="form-group">
+                <input type="number" class="form-control" placeholder="จำนวนในสต็อก">
+            </div>
+            <button class="btn-primary">บันทึกสินค้า</button>
         </div>
 
-        <!-- Mobile Menu Dropdown -->
-        <div id="mobile-menu" class="hidden md:hidden glass-card border-t border-gray-800 px-6 py-4 space-y-4 shadow-2xl">
-            <a href="#about" class="block text-gray-300 hover:text-accentBlue transition">เกี่ยวกับฉัน</a>
-            <a href="#coop" class="block text-gray-300 hover:text-accentBlue transition">ฝึกสหกิจ</a>
-            <a href="#skills" class="block text-gray-300 hover:text-accentBlue transition">ทักษะ</a>
-            <a href="#projects" class="block text-gray-300 hover:text-accentBlue transition">โปรเจกต์</a>
-            <a href="#contact" class="block text-gray-300 hover:text-accentBlue transition">ติดต่อ</a>
-        </div>
-    </header>
-
-    <!-- Hero Section -->
-    <section class="min-h-screen flex items-center justify-center pt-24 pb-12 px-4 relative">
-        <div class="max-w-4xl mx-auto text-center z-10">
-            <div class="inline-flex items-center gap-2 px-4 py-2 mb-6 text-xs font-semibold rounded-full bg-slate-900/90 text-accentBlue border border-sky-500/30 shadow-lg shadow-sky-500/10 animate-float">
-                <span class="w-2 h-2 rounded-full bg-accentNeon animate-ping"></span>
-                <span>พร้อมปฏิบัติสหกิจศึกษา (Co-op Education 2026)</span>
-            </div>
-            <h1 class="text-4xl sm:text-6xl font-extrabold tracking-tight mb-6 leading-tight">
-                Hello, I'm <span class="text-transparent bg-clip-text bg-gradient-to-r from-accentBlue via-accentNeon to-accentPurple glow-text">[ชื่อของคุณ]</span>
-            </h1>
-            <p class="text-base sm:text-xl text-gray-400 mb-10 max-w-2xl mx-auto leading-relaxed">
-                นักศึกษาพัฒนาซอฟต์แวร์ผู้หลงใหลในการสร้างสรรค์ Web Application ที่มีดีไซน์ล้ำสมัย ประสบการณ์สูง พร้อมเรียนรู้และลุยงานจริงกับองค์กรชั้นนำ
-            </p>
-            <div class="flex flex-wrap justify-center gap-4">
-                <a href="#coop" class="px-8 py-3.5 rounded-xl bg-gradient-to-r from-accentBlue to-accentNeon text-gray-950 font-bold hover:scale-105 transition duration-300 glow-border shadow-lg shadow-cyan-500/20">
-                    สำรวจข้อมูลสหกิจ <i class="fa-solid fa-arrow-right ml-2"></i>
-                </a>
-                <a href="#projects" class="px-8 py-3.5 rounded-xl glass-card text-gray-200 font-semibold hover:bg-slate-800/80 hover:scale-105 transition duration-300">
-                    ดูผลงานทั้งหมด
-                </a>
-            </div>
-        </div>
-    </section>
-
-    <!-- About Me Section -->
-    <section id="about" class="py-20 px-4 max-w-6xl mx-auto">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl font-extrabold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-accentBlue to-accentNeon">เกี่ยวกับฉัน</h2>
-            <p class="text-gray-400 text-sm">ข้อมูลส่วนตัวและทัศนคติในการทำงาน</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-3 gap-8 items-center">
-            <div class="md:col-span-1 flex justify-center">
-                <div class="relative w-56 h-56 rounded-3xl overflow-hidden glass-card p-2 glow-border">
-                    <!-- รูปโปรไฟล์ -->
-                    <img src="https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=500" alt="Profile" class="w-full h-full object-cover rounded-2xl filter grayscale contrast-125 hover:grayscale-0 transition duration-500">
-                </div>
-            </div>
-            <div class="md:col-span-2 glass-card p-8 rounded-3xl relative overflow-hidden">
-                <div class="absolute top-0 right-0 w-32 h-32 bg-sky-500/10 rounded-full blur-2xl pointer-events-none"></div>
-                <h3 class="text-2xl font-bold mb-4 text-accentBlue flex items-center gap-2">
-                    <i class="fa-solid fa-user-astronaut"></i> Profile & Education
-                </h3>
-                <p class="text-gray-300 leading-relaxed mb-6">
-                    เป็นคนที่มีความมุ่งมั่น ตั้งใจจริง และรักในการเขียนโค้ด ชอบศึกษาเทคโนโลยี Front-end และ Web Development ใหม่ๆ อยู่เสมอ พร้อมรับฟังคำแนะนำและปรับตัวเข้ากับการทำงานร่วมกับผู้อื่นในสภาพแวดล้อมจริงได้อย่างรวดเร็ว
-                </p>
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4 text-sm bg-slate-900/50 p-4 rounded-2xl border border-slate-800">
-                    <div><span class="text-gray-400 font-medium">มหาวิทยาลัย:</span> [ระบุชื่อมหาวิทยาลัย]</div>
-                    <div><span class="text-gray-400 font-medium">สาขาวิชา:</span> [ระบุสาขา]</div>
-                    <div><span class="text-gray-400 font-medium">เกรดเฉลี่ย (GPA):</span> <span class="text-accentNeon font-bold">[ระบุ GPA]</span></div>
-                    <div><span class="text-gray-400 font-medium">ความสนใจพิเศษ:</span> Frontend, UI/UX Design</div>
-                </div>
+        <!-- รายการสินค้าคงเหลือ -->
+        <div class="card">
+            <h3>รายการสินค้าคงเหลือ</h3>
+            <div class="table-container">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ชื่อสินค้า</th>
+                            <th class="text-center">จำนวน</th>
+                            <th class="text-right">ลบ</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr>
+                            <td>พัดลมฟาร์ม ขนาด 16 นิ้ว</td>
+                            <td class="text-center">30</td>
+                            <td class="text-right"><button class="btn-danger">✕</button></td>
+                        </tr>
+                        <tr>
+                            <td>พัดลมฟาร์ม ขนาด 20 นิ้ว</td>
+                            <td class="text-center">50</td>
+                            <td class="text-right"><button class="btn-danger">✕</button></td>
+                        </tr>
+                        <tr>
+                            <td>พัดลมฟาร์ม ขนาด 24 นิ้ว</td>
+                            <td class="text-center">16</td>
+                            <td class="text-right"><button class="btn-danger">✕</button></td>
+                        </tr>
+                    </tbody>
+                </table>
             </div>
         </div>
-    </section>
+    </div>
 
-    <!-- Cooperative Education Section -->
-    <section id="coop" class="py-20 px-4 max-w-6xl mx-auto">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl font-extrabold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-accentBlue to-accentNeon">รายละเอียดการฝึกสหกิจศึกษา</h2>
-            <p class="text-gray-400 text-sm">สถานที่ปฏิบัติงานและภาระกิจโปรเจกต์สหกิจ</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Company Box -->
-            <div class="glass-card p-8 rounded-3xl flex flex-col justify-between group hover:border-accentBlue transition duration-500">
-                <div>
-                    <div class="flex items-center space-x-4 mb-6">
-                        <div class="w-12 h-12 rounded-2xl bg-sky-950/80 border border-sky-500/30 flex items-center justify-center text-accentBlue text-xl group-hover:scale-110 transition duration-300">
-                            <i class="fa-solid fa-building-columns"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-gray-100">[ชื่อสถานประกอบการ / บริษัท]</h3>
-                            <p class="text-xs text-accentBlue mt-1"><i class="fa-solid fa-briefcase mr-1"></i> ตำแหน่ง: Software Developer Intern</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-300 text-sm leading-relaxed mb-6">
-                        ปฏิบัติงานจริงในสายงานพัฒนาซอฟต์แวร์ เรียนรู้กระบวนการทำงานแบบ Agile/Scrum ร่วมกับทีมมืออาชีพ พัฒนาและแก้ไขบั๊ก พร้อมปรับปรุงประสิทธิภาพของระบบให้ตอบโจทย์ผู้ใช้งาน
-                    </p>
-                </div>
-                <div class="border-t border-slate-800/80 pt-4 text-xs text-gray-400 flex items-center gap-2">
-                    <i class="fa-solid fa-circle-check text-accentNeon"></i> ผ่านการประเมินและได้รับคำปรึกษาจาก Mentor ตลอดโครงการ
-                </div>
-            </div>
-
-            <!-- Project Box -->
-            <div class="glass-card p-8 rounded-3xl flex flex-col justify-between group hover:border-accentPurple transition duration-500">
-                <div>
-                    <div class="flex items-center space-x-4 mb-6">
-                        <div class="w-12 h-12 rounded-2xl bg-indigo-950/80 border border-indigo-500/30 flex items-center justify-center text-accentPurple text-xl group-hover:scale-110 transition duration-300">
-                            <i class="fa-solid fa-laptop-code"></i>
-                        </div>
-                        <div>
-                            <h3 class="text-xl font-bold text-gray-100">[ชื่อโปรเจกต์สหกิจศึกษา]</h3>
-                            <p class="text-xs text-accentPurple mt-1"><i class="fa-solid fa-code-merge mr-1"></i> Co-op Project Assignment</p>
-                        </div>
-                    </div>
-                    <p class="text-gray-300 text-sm leading-relaxed mb-6">
-                        โปรเจกต์พัฒนาระบบ <span class="text-white font-medium">[ระบุชื่อระบบ เช่น ระบบจัดการคลังสินค้า/แดชบอร์ดข้อมูล]</span> ที่ช่วยลดขั้นตอนการทำงานและเพิ่มความสะดวกรวดเร็วให้กับองค์กร
-                    </p>
-                </div>
-                <div class="flex flex-wrap gap-2">
-                    <span class="px-3 py-1 text-xs rounded-lg bg-sky-950/60 text-accentBlue border border-sky-500/20 font-medium">Tailwind CSS</span>
-                    <span class="px-3 py-1 text-xs rounded-lg bg-indigo-950/60 text-accentPurple border border-indigo-500/20 font-medium">JavaScript</span>
-                    <span class="px-3 py-1 text-xs rounded-lg bg-slate-900 text-gray-300 border border-slate-700 font-medium">GitHub Pages</span>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Skills Section -->
-    <section id="skills" class="py-20 px-4 max-w-6xl mx-auto">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl font-extrabold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-accentBlue to-accentNeon">ทักษะและความสามารถ</h2>
-            <p class="text-gray-400 text-sm">เครื่องมือและภาษาที่ใช้ในการพัฒนา</p>
-        </div>
-
-        <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-6">
-            <!-- Skill 1 -->
-            <div class="glass-card p-6 rounded-3xl hover:-translate-y-1 transition duration-300">
-                <div class="w-10 h-10 rounded-xl bg-sky-950 text-accentBlue flex items-center justify-center text-lg mb-4 border border-sky-500/20">
-                    <i class="fa-solid fa-code"></i>
-                </div>
-                <h3 class="text-lg font-bold mb-3 text-gray-200">Frontend Dev</h3>
-                <ul class="space-y-2.5 text-sm text-gray-300">
-                    <li class="flex items-center gap-2"><i class="fa-solid fa-chevron-right text-xs text-accentBlue"></i> HTML5 / CSS3 / JavaScript</li>
-                    <li class="flex items-center gap-2"><i class="fa-solid fa-chevron-right text-xs text-accentBlue"></i> Tailwind CSS / Responsive UI</li>
-                    <li class="flex items-center gap-2"><i class="fa-solid fa-chevron-right text-xs text-accentBlue"></i> React.js พื้นฐาน</li>
-                </ul>
-            </div>
-
-            <!-- Skill 2 -->
-            <div class="glass-card p-6 rounded-3xl hover:-translate-y-1 transition duration-300">
-                <div class="w-10 h-10 rounded-xl bg-indigo-950 text-accentPurple flex items-center justify-center text-lg mb-4 border border-indigo-500/20">
-                    <i class="fa-solid fa-toolbox"></i>
-                </div>
-                <h3 class="text-lg font-bold mb-3 text-gray-200">Tools & Workflow</h3>
-                <ul class="space-y-2.5 text-sm text-gray-300">
-                    <li class="flex items-center gap-2"><i class="fa-solid fa-chevron-right text-xs text-accentPurple"></i> Git & GitHub / Hosting</li>
-                    <li class="flex items-center gap-2"><i class="fa-solid fa-chevron-right text-xs text-accentPurple"></i> VS Code / iPad Dev Env</li>
-                    <li class="flex items-center gap-2"><i class="fa-solid fa-chevron-right text-xs text-accentPurple"></i> REST API Integration</li>
-                </ul>
-            </div>
-
-            <!-- Skill 3 -->
-            <div class="glass-card p-6 rounded-3xl hover:-translate-y-1 transition duration-300 sm:col-span-2 md:col-span-1">
-                <div class="w-10 h-10 rounded-xl bg-teal-950 text-teal-400 flex items-center justify-center text-lg mb-4 border border-teal-500/20">
-                    <i class="fa-solid fa-users-viewfinder"></i>
-                </div>
-                <h3 class="text-lg font-bold mb-3 text-gray-200">Soft Skills</h3>
-                <ul class="space-y-2.5 text-sm text-gray-300">
-                    <li class="flex items-center gap-2"><i class="fa-solid fa-chevron-right text-xs text-teal-400"></i> การทำงานเป็นทีม (Teamwork)</li>
-                    <li class="flex items-center gap-2"><i class="fa-solid fa-chevron-right text-xs text-teal-400"></i> การเรียนรู้ไว (Fast Learner)</li>
-                    <li class="flex items-center gap-2"><i class="fa-solid fa-chevron-right text-xs text-teal-400"></i> การแก้ปัญหาเฉพาะหน้า</li>
-                </ul>
-            </div>
-        </div>
-    </section>
-
-    <!-- Projects Section -->
-    <section id="projects" class="py-20 px-4 max-w-6xl mx-auto">
-        <div class="text-center mb-16">
-            <h2 class="text-3xl font-extrabold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-accentBlue to-accentNeon">ผลงานโปรเจกต์</h2>
-            <p class="text-gray-400 text-sm">รวมโปรเจกต์เด่นที่นำมาใส่ใน Portfolio</p>
-        </div>
-
-        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
-            <!-- Project Card 1 -->
-            <div class="glass-card rounded-3xl overflow-hidden flex flex-col justify-between group">
-                <div class="p-8">
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-xl font-bold text-accentBlue group-hover:underline">[ชื่อโปรเจกต์ที่ 1]</h3>
-                        <a href="#" class="text-gray-400 hover:text-accentNeon transition text-xl"><i class="fa-brands fa-github"></i></a>
-                    </div>
-                    <p class="text-gray-300 text-sm mb-6 leading-relaxed">
-                        ระบบเว็บแอปพลิเคชันที่ออกแบบด้วยแนวคิด Modern UI/UX รองรับหน้าจอทุกขนาด จัดการข้อมูลได้อย่างรวดเร็วและปลอดภัย
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="px-3 py-1 text-xs rounded-lg bg-slate-900 text-gray-300 border border-slate-700">HTML5</span>
-                        <span class="px-3 py-1 text-xs rounded-lg bg-slate-900 text-gray-300 border border-slate-700">Tailwind CSS</span>
-                        <span class="px-3 py-1 text-xs rounded-lg bg-slate-900 text-gray-300 border border-slate-700">JavaScript</span>
-                    </div>
-                </div>
-                <div class="px-8 py-4 bg-slate-950/60 border-t border-slate-800/80 flex justify-between items-center text-xs">
-                    <span class="text-emerald-400 font-medium flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> พร้อมใช้งาน</span>
-                    <a href="#" class="text-accentBlue hover:underline font-semibold flex items-center gap-1">Demo <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>
-                </div>
-            </div>
-
-            <!-- Project Card 2 -->
-            <div class="glass-card rounded-3xl overflow-hidden flex flex-col justify-between group">
-                <div class="p-8">
-                    <div class="flex justify-between items-start mb-4">
-                        <h3 class="text-xl font-bold text-accentPurple group-hover:underline">[ชื่อโปรเจกต์ที่ 2]</h3>
-                        <a href="#" class="text-gray-400 hover:text-accentNeon transition text-xl"><i class="fa-brands fa-github"></i></a>
-                    </div>
-                    <p class="text-gray-300 text-sm mb-6 leading-relaxed">
-                        ระบบบริหารจัดการข้อมูลจำลอง พัฒนาฟังก์ชันการเพิ่ม ลบ แก้ไข ข้อมูล พร้อมเชื่อมต่อระบบแสดงผลที่เรียบง่ายและใช้งานสะดวก
-                    </p>
-                    <div class="flex flex-wrap gap-2">
-                        <span class="px-3 py-1 text-xs rounded-lg bg-slate-900 text-gray-300 border border-slate-700">JavaScript</span>
-                        <span class="px-3 py-1 text-xs rounded-lg bg-slate-900 text-gray-300 border border-slate-700">REST API</span>
-                    </div>
-                </div>
-                <div class="px-8 py-4 bg-slate-950/60 border-t border-slate-800/80 flex justify-between items-center text-xs">
-                    <span class="text-emerald-400 font-medium flex items-center gap-1.5"><span class="w-1.5 h-1.5 rounded-full bg-emerald-400"></span> พร้อมใช้งาน</span>
-                    <a href="#" class="text-accentPurple hover:underline font-semibold flex items-center gap-1">Source Code <i class="fa-solid fa-arrow-up-right-from-square text-[10px]"></i></a>
-                </div>
-            </div>
-        </div>
-    </section>
-
-    <!-- Contact Section -->
-    <section id="contact" class="py-20 px-4 max-w-4xl mx-auto">
-        <div class="glass-card p-8 sm:p-12 rounded-3xl relative overflow-hidden glow-border">
-            <div class="absolute -right-10 -bottom-10 w-48 h-48 bg-sky-500/10 rounded-full blur-3xl pointer-events-none"></div>
-
-            <div class="text-center mb-10">
-                <h2 class="text-3xl font-extrabold mb-3 text-transparent bg-clip-text bg-gradient-to-r from-accentBlue to-accentNeon">ช่องทางการติดต่อ</h2>
-                <p class="text-gray-400 text-sm">สนใจร่วมงานหรือสอบถามข้อมูลเพิ่มเติม ติดต่อได้เลยครับ</p>
-            </div>
-
-            <div class="grid grid-cols-1 sm:grid-cols-3 gap-6 text-center mb-10">
-                <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-accentBlue transition duration-300">
-                    <div class="text-accentBlue text-xl mb-2"><i class="fa-solid fa-envelope"></i></div>
-                    <div class="text-xs text-gray-400 mb-1">Email</div>
-                    <div class="text-xs sm:text-sm font-medium text-gray-200">your.email@gmail.com</div>
-                </div>
-                <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-accentPurple transition duration-300">
-                    <div class="text-accentPurple text-xl mb-2"><i class="fa-solid fa-phone"></i></div>
-                    <div class="text-xs text-gray-400 mb-1">Phone</div>
-                    <div class="text-xs sm:text-sm font-medium text-gray-200">0xx-xxx-xxxx</div>
-                </div>
-                <div class="p-5 rounded-2xl bg-slate-900/60 border border-slate-800 hover:border-teal-400 transition duration-300">
-                    <div class="text-teal-400 text-xl mb-2"><i class="fa-brands fa-github"></i></div>
-                    <div class="text-xs text-gray-400 mb-1">GitHub</div>
-                    <div class="text-xs sm:text-sm font-medium text-gray-200">github.com/yourname</div>
-                </div>
-            </div>
-
-            <!-- Contact Form -->
-            <form onsubmit="event.preventDefault(); alert('ส่งข้อความเรียบร้อยแล้ว ขอบคุณที่ติดต่อครับ!');" class="space-y-4">
-                <div class="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                    <input type="text" placeholder="ชื่อของคุณ" required class="w-full px-4 py-3.5 rounded-xl bg-slate-900/80 border border-slate-800 focus:border-accentBlue focus:outline-none text-sm text-gray-200 transition">
-                    <input type="email" placeholder="อีเมลของคุณ" required class="w-full px-4 py-3.5 rounded-xl bg-slate-900/80 border border-slate-800 focus:border-accentBlue focus:outline-none text-sm text-gray-200 transition">
-                </div>
-                <textarea rows="4" placeholder="ข้อความที่ต้องการส่ง..." required class="w-full px-4 py-3.5 rounded-xl bg-slate-900/80 border border-slate-800 focus:border-accentBlue focus:outline-none text-sm text-gray-200 transition"></textarea>
-                <div class="text-center pt-2">
-                    <button type="submit" class="px-8 py-3.5 rounded-xl bg-gradient-to-r from-accentBlue to-accentNeon text-gray-950 font-bold hover:scale-105 transition duration-300 glow-border text-sm">
-                        ส่งข้อความ <i class="fa-solid fa-paper-plane ml-1.5"></i>
-                    </button>
-                </div>
-            </form>
-        </div>
-    </section>
-
-    <!-- Footer -->
-    <footer class="py-8 text-center text-xs text-gray-500 border-t border-slate-800/80 bg-slate-950/40">
-        <p>&copy; 2026 Co-op Education Portfolio. Built with Modern Tech Stack.</p>
-    </footer>
-
-    <!-- Mobile Menu Script -->
-    <script>
-        const menuBtn = document.getElementById('menu-btn');
-        const mobileMenu = document.getElementById('mobile-menu');
-
-        menuBtn.addEventListener('click', () => {
-            mobileMenu.classList.toggle('hidden');
-        });
-
-        document.querySelectorAll('#mobile-menu a').forEach(link => {
-            link.addEventListener('click', () => {
-                mobileMenu.classList.add('hidden');
-            });
-        });
-    </script>
 </body>
 </html>
