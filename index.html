@@ -142,6 +142,12 @@
         .btn-danger:hover {
             background-color: #c0392b;
         }
+
+        .empty-row {
+            text-align: center;
+            color: #a0aec0;
+            padding: 20px;
+        }
     </style>
 </head>
 <body>
@@ -149,16 +155,18 @@
     <div class="container">
         <h2 class="title">📦 ระบบจัดการสต็อกสินค้า</h2>
 
-        <!-- ฟอร์มเพิ่ม/แก้ไขข้อมูล -->
+        <!-- ฟอร์มเพิ่มข้อมูล -->
         <div class="card">
             <h3>เพิ่ม / แก้ไขข้อมูลสินค้า</h3>
-            <div class="form-group">
-                <input type="text" class="form-control" placeholder="ชื่อสินค้า (เช่น เสื้อโปโล)">
-            </div>
-            <div class="form-group">
-                <input type="number" class="form-control" placeholder="จำนวนในสต็อก">
-            </div>
-            <button class="btn-primary">บันทึกสินค้า</button>
+            <form id="productForm">
+                <div class="form-group">
+                    <input type="text" id="productName" class="form-control" placeholder="ชื่อสินค้า (เช่น เสื้อโปโล)" required>
+                </div>
+                <div class="form-group">
+                    <input type="number" id="productQty" class="form-control" placeholder="จำนวนในสต็อก" min="0" required>
+                </div>
+                <button type="submit" class="btn-primary">บันทึกสินค้า</button>
+            </form>
         </div>
 
         <!-- รายการสินค้าคงเหลือ -->
@@ -169,31 +177,94 @@
                     <thead>
                         <tr>
                             <th>ชื่อสินค้า</th>
-                            <th class="text-center">จำนวน</th>
-                            <th class="text-right">ลบ</th>
+                            <th class="text-center" style="width: 120px;">จำนวน</th>
+                            <th class="text-right" style="width: 80px;">ลบ</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td>พัดลมฟาร์ม ขนาด 16 นิ้ว</td>
-                            <td class="text-center">30</td>
-                            <td class="text-right"><button class="btn-danger">✕</button></td>
-                        </tr>
-                        <tr>
-                            <td>พัดลมฟาร์ม ขนาด 20 นิ้ว</td>
-                            <td class="text-center">50</td>
-                            <td class="text-right"><button class="btn-danger">✕</button></td>
-                        </tr>
-                        <tr>
-                            <td>พัดลมฟาร์ม ขนาด 24 นิ้ว</td>
-                            <td class="text-center">16</td>
-                            <td class="text-right"><button class="btn-danger">✕</button></td>
-                        </tr>
+                    <tbody id="productTableBody">
+                        <!-- ข้อมูลจะถูกเรนเดอร์อัตโนมัติด้วย JavaScript -->
                     </tbody>
                 </table>
             </div>
         </div>
     </div>
 
+    <script>
+        // ดึงข้อมูลจาก LocalStorage หรือใช้ค่าเริ่มต้นถ้ายังไม่มี
+        let products = JSON.parse(localStorage.getItem('stock_products')) || [
+            { id: 1, name: 'พัดลมฟาร์ม ขนาด 16 นิ้ว', qty: 30 },
+            { id: 2, name: 'พัดลมฟาร์ม ขนาด 20 นิ้ว', qty: 50 },
+            { id: 3, name: 'พัดลมฟาร์ม ขนาด 24 นิ้ว', qty: 16 }
+        ];
+
+        const productForm = document.getElementById('productForm');
+        const productNameInput = document.getElementById('productName');
+        const productQtyInput = document.getElementById('productQty');
+        const productTableBody = document.getElementById('productTableBody');
+
+        // ฟังก์ชันสำหรับแสดงผลข้อมูลลงในตาราง
+        function renderTable() {
+            productTableBody.innerHTML = '';
+
+            if (products.length === 0) {
+                productTableBody.innerHTML = `<tr><td colspan="3" class="empty-row">ไม่มีรายการสินค้าในสต็อก</td></tr>`;
+                return;
+            }
+
+            products.forEach((product, index) => {
+                const tr = document.createElement('tr');
+                tr.innerHTML = `
+                    <td>${escapeHtml(product.name)}</td>
+                    <td class="text-center">${product.qty}</td>
+                    <td class="text-right">
+                        <button class="btn-danger" onclick="deleteProduct(${index})">✕</button>
+                    </td>
+                `;
+                productTableBody.appendChild(tr);
+            });
+        }
+
+        // ฟังก์ชันเพิ่มสินค้า
+        productForm.addEventListener('submit', function(e) {
+            e.preventDefault(); // ป้องกันการรีเฟรชหน้าเว็บแบบปกติ
+
+            const name = productNameInput.value.trim();
+            const qty = parseInt(productQtyInput.value);
+
+            if (name && !isNaN(qty)) {
+                // เพิ่มข้อมูลใหม่เข้าไปในอาร์เรย์
+                products.push({ id: Date.now(), name: name, qty: qty });
+                
+                // บันทึกลง LocalStorage
+                saveAndRefresh();
+
+                // ล้างค่าในฟอร์ม
+                productNameInput.value = '';
+                productQtyInput.value = '';
+            }
+        });
+
+        // ฟังก์ชันลบสินค้า
+        window.deleteProduct = function(index) {
+            if (confirm('คุณต้องการลบสินค้านี้ใช่หรือไม่?')) {
+                products.splice(index, 1); // ตัดข้อมูลออก 1 ตัวตาม index
+                saveAndRefresh();
+            }
+        }
+
+        // ฟังก์ชันบันทึกข้อมูลและอัปเดตตาราง
+        function saveAndRefresh() {
+            localStorage.setItem('stock_products', JSON.stringify(products));
+            renderTable();
+        }
+
+        // ป้องกัน XSS เบื้องต้น
+        function escapeHtml(text) {
+            return text.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+        }
+
+        // โหลดแสดงผลครั้งแรกเมื่อเปิดหน้าเว็บ
+        renderTable();
+    </script>
 </body>
 </html>
